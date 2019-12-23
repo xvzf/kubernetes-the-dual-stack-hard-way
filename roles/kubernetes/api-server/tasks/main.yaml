@@ -1,0 +1,32 @@
+---
+- name: kube-apiserver directory
+  file:
+    path: /var/lib/kubernetes
+    state: directory
+
+- name: kube-apiserver service file
+  template:
+    src: kube-apiserver.service
+    dest: /etc/systemd/system/kube-apiserver.service
+    mode: 0644
+    owner: etcd
+
+- name: copy certs
+  copy:
+    remote_src: yes
+    src: "{{ kubernetes.pki.path }}/{{ item }}"
+    dest: "/var/lib/kubernetes/{{ item }}"
+  with_items:
+    - ca.pem
+    - kubernetes.pem
+    - kubernetes-key.pem
+    - service-account.pem
+    - service-account-key.pem
+    - encryption-config.yaml
+
+- name: Start kube-apiserver service
+  systemd:
+    name: kube-apiserver
+    daemon_reload: yes
+    enabled: yes
+    state: restarted

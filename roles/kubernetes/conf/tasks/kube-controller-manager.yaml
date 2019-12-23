@@ -1,0 +1,31 @@
+---
+- shell: |
+    kubectl config set-cluster citadel-k8s \
+        --certificate-authority=ca.pem \
+        --embed-certs=true \
+        --server=https://{{ kubernetes.network.public.ipv4 }}:6443 \
+        --kubeconfig={{ kubernetes.conf.path }}/kube-controller-manager.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"
+
+- shell: |
+    kubectl config set-credentials system:kube-controller-manager \
+      --client-certificate=kube-controller-manager.pem \
+      --client-key=kube-controller-manager-key.pem \
+      --embed-certs=true \
+      --kubeconfig={{ kubernetes.conf.path }}/kube-controller-manager.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"
+
+- shell: |
+    kubectl config set-context default \
+      --cluster=citadel-k8s \
+      --user=system:kube-controller-manager \
+      --kubeconfig={{ kubernetes.conf.path }}/kube-controller-manager.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"
+
+- shell: |
+    kubectl config use-context default --kubeconfig={{ kubernetes.conf.path }}/kube-controller-manager.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"

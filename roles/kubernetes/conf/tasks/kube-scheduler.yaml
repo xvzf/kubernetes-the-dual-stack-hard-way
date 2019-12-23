@@ -1,0 +1,31 @@
+---
+- shell: |
+    kubectl config set-cluster citadel-k8s \
+        --certificate-authority=ca.pem \
+        --embed-certs=true \
+        --server=https://{{ kubernetes.network.public.ipv4 }}:6443 \
+        --kubeconfig={{ kubernetes.conf.path }}/kube-scheduler.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"
+
+- shell: |
+    kubectl config set-credentials system:kube-scheduler \
+      --client-certificate=kube-scheduler.pem \
+      --client-key=kube-scheduler-key.pem \
+      --embed-certs=true \
+      --kubeconfig={{ kubernetes.conf.path }}/kube-scheduler.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"
+
+- shell: |
+    kubectl config set-context default \
+      --cluster=citadel-k8s \
+      --user=system:kube-scheduler \
+      --kubeconfig={{ kubernetes.conf.path }}/kube-scheduler.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"
+
+- shell: |
+    kubectl config use-context default --kubeconfig={{ kubernetes.conf.path }}/kube-scheduler.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"

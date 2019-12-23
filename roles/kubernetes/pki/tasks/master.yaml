@@ -1,0 +1,31 @@
+
+- name: Generate Masters private key
+  openssl_privatekey:
+    path: '{{ kubernetes.pki.path }}/k8s-master-key.pem'
+
+- name: Generate Masters CSR
+  openssl_csr:
+    path: '{{ kubernetes.pki.path }}/k8s-master.csr'
+    privatekey_path: '{{ kubernetes.pki.path }}/k8s-master-key.pem'
+    common_name: 'k8s-master'
+    basic_constraints: "CA:FALSE"
+    basic_constraints_critical: True
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: True
+    extended_key_usage:
+      - serverAuth
+      # - clientAuth
+    organization_name: 'system:masters'
+    organizational_unit_name: 'k8s the hard way'
+    # subject_alt_name: "DNS:kubernetes.default, IP:{{ hostvars[host].ansible_eth0.ipv4.address }}, IP:{{ hostvars[host].ansible_eth0.ipv6.address }}, IP:127.0.0.1"
+    subject_alt_name: "DNS:kubernetes.default"
+
+- name: Generate Masters certificate
+  openssl_certificate:
+    path: '{{ kubernetes.pki.path }}/k8s-master.pem'
+    csr_path: '{{ kubernetes.pki.path }}/k8s-master.csr'
+    ownca_path: '{{ kubernetes.pki.path }}/ca.pem'
+    ownca_privatekey_path: '{{ kubernetes.pki.path }}/ca-key.pem'
+    provider: ownca

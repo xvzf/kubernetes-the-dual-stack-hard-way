@@ -1,0 +1,16 @@
+---
+- hosts: lolinetta
+  become: true
+
+  roles:
+    - containerd
+    - cni_plugins
+    - kubernetes/base
+    - kubernetes/pki
+    - kubernetes/conf
+    - kubernetes/etcd
+    - kubernetes/api-server
+    - kubernetes/controller-manager
+    - kubernetes/scheduler
+    - kubernetes/cni
+    - kubernetes/kubelet

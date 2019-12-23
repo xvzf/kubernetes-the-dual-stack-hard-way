@@ -1,0 +1,28 @@
+- name: Generate kube-controller-manager private key
+  openssl_privatekey:
+    path: '{{ kubernetes.pki.path }}/kube-controller-manager-key.pem'
+
+- name: Generate kube-controller-manager CSR
+  openssl_csr:
+    path: '{{ kubernetes.pki.path }}/kube-controller-manager.csr'
+    privatekey_path: '{{ kubernetes.pki.path }}/kube-controller-manager-key.pem'
+    basic_constraints: "CA:FALSE"
+    basic_constraints_critical: True
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: True
+    extended_key_usage:
+      - serverAuth
+      - clientAuth
+    common_name: k8s-kube-controller-manager
+    organization_name: "system:masters"
+    organizational_unit_name: k8s the hard way
+
+- name: Generate kube-controller-manager certificate
+  openssl_certificate:
+    path: '{{ kubernetes.pki.path }}/kube-controller-manager.pem'
+    csr_path: '{{ kubernetes.pki.path }}/kube-controller-manager.csr'
+    ownca_path: '{{ kubernetes.pki.path }}/ca.pem'
+    ownca_privatekey_path: '{{ kubernetes.pki.path }}/ca-key.pem'
+    provider: ownca

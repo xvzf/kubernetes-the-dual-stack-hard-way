@@ -1,0 +1,29 @@
+- name: Generate kubelet private key
+  openssl_privatekey:
+    path: '{{ kubernetes.pki.path }}/kubelet-key.pem'
+
+- name: Generate kubelet CSR
+  openssl_csr:
+    path: '{{ kubernetes.pki.path }}/kubelet.csr'
+    privatekey_path: '{{ kubernetes.pki.path }}/kubelet-key.pem'
+    basic_constraints: "CA:FALSE"
+    basic_constraints_critical: True
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    key_usage_critical: True
+    extended_key_usage:
+      - serverAuth
+      - clientAuth
+    common_name: k8s-kubernetes
+    organization_name: "system:masters"
+    organizational_unit_name: k8s the hard way
+    subject_alt_name: "DNS:{{ ansible_facts['nodename'] }},IP:127.0.0.1,IP:{{ kubernetes.network.public.ipv4 }},IP:{{ kubernetes.network.public.ipv6 }}"
+
+- name: Generate kubelet certificate
+  openssl_certificate:
+    path: '{{ kubernetes.pki.path }}/kubelet.pem'
+    csr_path: '{{ kubernetes.pki.path }}/kubelet.csr'
+    ownca_path: '{{ kubernetes.pki.path }}/ca.pem'
+    ownca_privatekey_path: '{{ kubernetes.pki.path }}/ca-key.pem'
+    provider: ownca

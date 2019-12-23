@@ -1,0 +1,14 @@
+- name: CNI config dir
+  file:
+    path: /etc/cni/net.d
+    state: directory
+
+- name: Copy k8s bridge config
+  template:
+    src: bridge.conf
+    dest: /etc/cni/net.d/10-bridge.conf
+
+- name: Copy loopback config
+  template:
+    src: loopback.conf
+    dest: /etc/cni/net.d/99-loopback.conf

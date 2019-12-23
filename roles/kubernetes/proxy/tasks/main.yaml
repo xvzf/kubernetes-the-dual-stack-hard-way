@@ -1,0 +1,40 @@
+---
+- name: kubelet directory
+  file:
+    path: /var/lib/kubernetes
+    state: directory
+
+- name: kubelet service file
+  template:
+    src: kubelet.service
+    dest: /etc/systemd/system/kubelet.service
+    mode: 0644
+
+- name: kubelet yaml
+  copy:
+    src: kubelet.yaml
+    dest: "{{ kubernetes.conf.path }}/kubelet.yaml"
+    mode: 0644
+
+- name: copy certs
+  copy:
+    remote_src: yes
+    src: "{{ kubernetes.pki.path }}/{{ item }}"
+    dest: "/var/lib/kubernetes/{{ item }}"
+  with_items:
+    - ca.pem
+    - kubelet.pem
+    - kubelet-key.pem
+
+- name: copy kubeconfig
+  copy:
+    remote_src: yes
+    src: "{{ kubernetes.conf.path }}/kubelet.kubeconfig"
+    dest: /var/lib/kubernetes/kubelet.kubeconfig
+
+- name: Start kubelet service
+  systemd:
+    name: kubelet
+    daemon_reload: yes
+    enabled: yes
+    state: restarted

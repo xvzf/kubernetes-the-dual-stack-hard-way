@@ -1,0 +1,52 @@
+---
+- name: group for etcd
+  group:
+    name: etcd
+    state: present
+    system: yes
+
+- name: user for etcd
+  user:
+    name: etcd
+    group: etcd
+    home: /
+    shell: /usr/sbin/nologin
+
+- name: etcd config dir
+  file:
+    path: /etc/etcd/
+    state: directory
+    mode: 0750
+    owner: etcd
+
+- name: etcd data dir
+  file:
+    path: /var/lib/etcd/
+    state: directory
+    mode: 0750
+    owner: etcd
+
+- name: etcd service file
+  template:
+    src: etcd.service
+    dest: /etc/systemd/system/etcd.service
+    mode: 0644
+    owner: etcd
+
+- name: copy certs
+  copy:
+    remote_src: yes
+    src: "{{ kubernetes.pki.path }}/{{ item }}"
+    dest: "/etc/etcd/{{ item }}"
+    owner: etcd
+  with_items:
+    - ca.pem
+    - kubernetes.pem
+    - kubernetes-key.pem
+
+- name: Start etcd service
+  systemd:
+    name: etcd
+    daemon_reload: yes
+    enabled: yes
+    state: restarted

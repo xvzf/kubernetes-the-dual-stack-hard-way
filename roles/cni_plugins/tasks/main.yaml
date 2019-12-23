@@ -1,0 +1,5 @@
+- name: Download containernetworking plugins
+  unarchive:
+    src: "https://github.com/containernetworking/plugins/releases/download/{{ kubernetes.versions.containernetworking_plugins }}/cni-plugins-linux-amd64-{{ kubernetes.versions.containernetworking_plugins }}.tgz"
+    dest: /opt/cni/bin
+    remote_src: yes

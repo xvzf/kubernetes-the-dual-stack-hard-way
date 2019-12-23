@@ -1,0 +1,41 @@
+---
+- name: kube-scheduler directory
+  file:
+    path: /var/lib/kubernetes
+    state: directory
+
+- name: kube-scheduler service file
+  template:
+    src: kube-scheduler.service
+    dest: /etc/systemd/system/kube-scheduler.service
+    mode: 0644
+
+- name: kube-scheduler yaml
+  copy:
+    src: kube-scheduler.yaml
+    dest: "{{ kubernetes.conf.path }}/kube-scheduler.yaml"
+    mode: 0644
+
+- name: copy certs
+  copy:
+    remote_src: yes
+    src: "{{ kubernetes.pki.path }}/{{ item }}"
+    dest: "/var/lib/kubernetes/{{ item }}"
+  with_items:
+    - ca.pem
+    - ca-key.pem
+    - service-account-key.pem
+
+- name: copy kubeconfig
+  copy:
+    remote_src: yes
+    src: "{{ kubernetes.conf.path }}/kube-scheduler.kubeconfig"
+    dest: /var/lib/kubernetes/kube-scheduler.kubeconfig
+
+
+- name: Start kube-scheduler service
+  systemd:
+    name: kube-scheduler
+    daemon_reload: yes
+    enabled: yes
+    state: restarted

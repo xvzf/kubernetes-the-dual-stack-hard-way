@@ -1,0 +1,26 @@
+---
+- name: Download kubernetes binaries
+  get_url:
+    url: "https://storage.googleapis.com/kubernetes-release/release/{{ kubernetes.versions.kubernetes }}/bin/linux/amd64/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+  retries: 3
+  delay: 1
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+    - kube-proxy
+    - kubelet
+    - kubectl
+
+- name: Download kubernetes binaries
+  file:
+    path: "/usr/local/bin/{{ item }}"
+    mode: 0755
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+    - kube-proxy
+    - kubelet
+    - kubectl

@@ -1,0 +1,22 @@
+kubernetes:
+
+  versions:
+    etcd: v3.4.3
+    kubernetes: v1.17.0
+    containerd: 1.3.2
+    containernetworking_plugins: v0.8.3
+
+
+  network:
+    public:
+      ipv4: "X.XX.XX.XX"
+      ipv6: "XXXX:XXXX:XX:XXX::X"
+    subnets:
+      cluster: "10.10.0.0/16,fc00::/64"
+      service: "10.255.0.0/16,fc01::/112"
+
+  conf:
+    path: /etc/kubernetes/conf
+
+  pki:
+    path: /etc/kubernetes/pki

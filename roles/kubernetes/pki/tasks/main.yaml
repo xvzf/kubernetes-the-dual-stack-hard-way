@@ -1,0 +1,20 @@
+---
+- name: Create dir for the PKI
+  file:
+    path: "{{ kubernetes.pki.path }}"
+    state: directory
+
+- include_tasks: ca.yaml
+- include_tasks: admin.yaml
+# - include_tasks: master.yaml
+# - include_tasks: kubeproxy.yaml
+- include_tasks: scheduler.yaml
+- include_tasks: controller-manager.yaml
+- include_tasks: api-server.yaml
+- include_tasks: service-account.yaml
+- include_tasks: kubelet.yaml
+
+- name: Generate encryption-config.yml
+  shell: echo "{{ encryption_config }}" > {{ kubernetes.pki.path }}/encryption-config.yaml
+  args:
+    creates: '{{ kubernetes.pki.path }}/encryption-config.yaml'

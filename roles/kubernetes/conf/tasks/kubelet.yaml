@@ -1,0 +1,31 @@
+---
+- shell: |
+    kubectl config set-cluster citadel-k8s \
+        --certificate-authority=ca.pem \
+        --embed-certs=true \
+        --server=https://{{ kubernetes.network.public.ipv4 }}:6443 \
+        --kubeconfig={{ kubernetes.conf.path }}/kubelet.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"
+
+- shell: |
+    kubectl config set-credentials system:kubelet \
+      --client-certificate=kubelet.pem \
+      --client-key=kubelet-key.pem \
+      --embed-certs=true \
+      --kubeconfig={{ kubernetes.conf.path }}/kubelet.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"
+
+- shell: |
+    kubectl config set-context default \
+      --cluster=citadel-k8s \
+      --user=system:kubelet \
+      --kubeconfig={{ kubernetes.conf.path }}/kubelet.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"
+
+- shell: |
+    kubectl config use-context default --kubeconfig={{ kubernetes.conf.path }}/kubelet.kubeconfig
+  args:
+    chdir: "{{ kubernetes.pki.path }}"

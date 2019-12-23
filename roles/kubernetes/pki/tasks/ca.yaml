@@ -1,0 +1,24 @@
+- name: Generate CA private key
+  openssl_privatekey:
+    path: "{{ kubernetes.pki.path }}/ca-key.pem"
+
+- name: Generate CA CSR
+  openssl_csr:
+    path: '{{ kubernetes.pki.path }}/ca.csr'
+    privatekey_path: '{{ kubernetes.pki.path }}/ca-key.pem'
+    basic_constraints: "CA:TRUE"
+    basic_constraints_critical: True
+    key_usage:
+      - cRLSign
+      - keyCertSign
+    key_usage_critical: True
+    organizational_unit_name: 'k8s the hard way'
+    common_name: k8s-CA
+
+- name: Generate CA certificate
+  openssl_certificate:
+    path: '{{ kubernetes.pki.path }}/ca.pem'
+    privatekey_path: '{{ kubernetes.pki.path }}/ca-key.pem'
+    csr_path: '{{ kubernetes.pki.path }}/ca.csr'
+    provider: selfsigned
+
