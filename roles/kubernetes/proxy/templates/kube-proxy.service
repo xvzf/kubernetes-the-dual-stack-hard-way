@@ -1,0 +1,18 @@
+[Unit]
+Description=Kubernetes Kube Proxy
+Documentation=https://github.com/kubernetes/kubernetes
+After=kubelet.service
+Requires=kubelet.service
+
+[Service]
+ExecStart=/usr/local/bin/kube-proxy \
+  --feature-gates="IPv6DualStack=true" \
+  --proxy-mode=ipvs \
+  --cluster-cidr="{{ kubernetes.network.subnets.service }}" \
+  --kubeconfig="/etc/kubernetes/conf/kube-proxy.kubeconfig"
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

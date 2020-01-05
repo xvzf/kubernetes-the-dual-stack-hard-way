@@ -7,7 +7,7 @@
 - include_tasks: ca.yaml
 - include_tasks: admin.yaml
 # - include_tasks: master.yaml
-# - include_tasks: kubeproxy.yaml
+- include_tasks: kubeproxy.yaml
 - include_tasks: scheduler.yaml
 - include_tasks: controller-manager.yaml
 - include_tasks: api-server.yaml

@@ -4,8 +4,8 @@
     path: "{{ kubernetes.conf.path }}"
     state: directory
 
-# - include: kube-proxy.yaml
 - include: kube-scheduler.yaml
 - include: kube-controller-manager.yaml
 - include: admin.yaml
 - include: kubelet.yaml
+- include: kube-proxy.yaml

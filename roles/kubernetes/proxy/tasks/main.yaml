@@ -1,19 +1,13 @@
 ---
-- name: kubelet directory
+- name: kube-proxy directory
   file:
     path: /var/lib/kubernetes
     state: directory
 
-- name: kubelet service file
+- name: kube-proxy service file
   template:
-    src: kubelet.service
-    dest: /etc/systemd/system/kubelet.service
-    mode: 0644
-
-- name: kubelet yaml
-  copy:
-    src: kubelet.yaml
-    dest: "{{ kubernetes.conf.path }}/kubelet.yaml"
+    src: kube-proxy.service
+    dest: /etc/systemd/system/kube-proxy.service
     mode: 0644
 
 - name: copy certs
@@ -23,18 +17,18 @@
     dest: "/var/lib/kubernetes/{{ item }}"
   with_items:
     - ca.pem
-    - kubelet.pem
-    - kubelet-key.pem
+    - kube-proxy.pem
+    - kube-proxy-key.pem
 
 - name: copy kubeconfig
   copy:
     remote_src: yes
-    src: "{{ kubernetes.conf.path }}/kubelet.kubeconfig"
-    dest: /var/lib/kubernetes/kubelet.kubeconfig
+    src: "{{ kubernetes.conf.path }}/kube-proxy.kubeconfig"
+    dest: /var/lib/kubernetes/kube-proxy.kubeconfig
 
-- name: Start kubelet service
+- name: Start kube-proxy service
   systemd:
-    name: kubelet
+    name: kube-proxy
     daemon_reload: yes
     enabled: yes
     state: restarted
